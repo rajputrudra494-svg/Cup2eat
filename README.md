@@ -17,26 +17,34 @@ It's a static site: plain HTML, CSS and JavaScript, with no build step.
 
 ## Run it locally
 
-Any static server works:
+Any static server works. Run this from the repo root:
 
 ```bash
-cd site
 python -m http.server 5173
 ```
 
 Then open http://localhost:5173.
 
+## Deploying
+
+The site sits at the repo root, so any static host can serve it as-is.
+
+On Vercel, use these settings:
+- Framework preset: **Other**
+- Root directory: **`./`**
+- Build command: leave empty
+- Output directory: leave empty
+
 ## Structure
 
 ```
-site/
-  index.html
-  css/style.css      base layout and type
-  css/maximal.css    patterns, stickers, mascot, dock, phone polish
-  js/main.js         scroll choreography, loader, calculator, dock, mascot
-  js/cup3d.js        the procedural three.js cup
-  vendor/            three.js 0.160, GSAP 3.12.5, Lenis 1.1.13
-  assets/            logo, photos, loader frames
+index.html
+css/style.css      base layout and type
+css/maximal.css    patterns, stickers, mascot, dock, phone polish
+js/main.js         scroll choreography, loader, calculator, dock, mascot
+js/cup3d.js        the procedural three.js cup
+vendor/            three.js 0.160, GSAP 3.12.5, Lenis 1.1.13
+assets/            logo, photos, loader frames
 ```
 
 ## Credits
