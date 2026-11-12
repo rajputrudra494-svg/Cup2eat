@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <defs>
+    <radialGradient id="g" cx="40%" cy="35%" r="75%">
+      <stop offset="0" stop-color="#1f7a57"/>
+      <stop offset=".6" stop-color="#11533c"/>
+      <stop offset="1" stop-color="#0a3427"/>
+    </radialGradient>
+    <linearGradient id="au" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f3dc9e"/>
+      <stop offset=".45" stop-color="#d4ae62"/>
+      <stop offset=".55" stop-color="#b98d42"/>
+      <stop offset="1" stop-color="#e9cd8a"/>
+    </linearGradient>
+  </defs>
+  <circle cx="100" cy="100" r="97" fill="url(#au)"/>
+  <circle cx="100" cy="100" r="90" fill="url(#g)"/>
+  <circle cx="100" cy="100" r="84" fill="none" stroke="url(#au)" stroke-width="1.6" opacity=".9"/>
+  <g fill="url(#au)" font-family="'Fraunces', Georgia, serif" font-weight="800" text-anchor="middle">
+    <text x="100" y="82" font-size="50" letter-spacing="1">CUP</text>
+    <text x="100" y="118" font-size="34">2</text>
+    <text x="100" y="161" font-size="50" letter-spacing="1">EAT</text>
+  </g>
+  <g stroke="url(#au)" stroke-width="2.4" stroke-linecap="round">
+    <line x1="38" y1="106" x2="84" y2="106"/>
+    <line x1="116" y1="106" x2="162" y2="106"/>
+  </g>
+  <circle cx="38" cy="106" r="3" fill="url(#au)"/>
+  <circle cx="162" cy="106" r="3" fill="url(#au)"/>
+</svg>

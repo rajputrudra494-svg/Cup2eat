@@ -1,0 +1,571 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cup2Eat — Eat your drink</title>
+  <meta name="description" content="Cup2Eat makes crisp, baked edible cups in chocolate, vanilla and elaichi. Pour in chai, coffee or ice cream — then eat the cup. FSSAI registered, shipped across India from Ghaziabad.">
+  <meta name="theme-color" content="#0b3b2e">
+  <meta property="og:title" content="Cup2Eat — Eat your drink">
+  <meta property="og:description" content="Edible cups for chai, coffee and ice cream. Made in Ghaziabad, shipped across India.">
+  <meta property="og:image" content="assets/img/chai-kulhad.jpg">
+  <link rel="icon" href="assets/logo.svg" type="image/svg+xml">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300..800&family=Caveat:wght@500;700&family=Fraunces:ital,opsz,wght,SOFT@0,9..144,300..900,50;1,9..144,300..900,50&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css?v=3">
+  <link rel="stylesheet" href="css/maximal.css?v=3">
+
+  <script type="importmap">
+    { "imports": { "three": "./vendor/three.module.min.js" } }
+  </script>
+</head>
+<body class="is-loading">
+
+  <!-- ============ PRELOADER ============ -->
+  <div class="loader" aria-hidden="true">
+    <div class="loader__brand"><img src="assets/logo.svg" alt="" width="40" height="40"><span>Cup2Eat</span></div>
+    <p class="loader__tag hand">brewing something good&hellip;</p>
+
+    <div class="loader__reel">
+      <img src="assets/loader/00.jpg" alt="" class="is-on">
+      <img src="assets/loader/01.jpg" alt="">
+      <img src="assets/loader/02.jpg" alt="">
+      <img src="assets/loader/03.jpg" alt="">
+      <img src="assets/loader/04.jpg" alt="">
+      <img src="assets/loader/05.jpg" alt="">
+      <img src="assets/loader/06.jpg" alt="">
+      <img src="assets/loader/07.jpg" alt="">
+      <img src="assets/loader/08.jpg" alt="">
+      <img src="assets/loader/09.jpg" alt="">
+      <img src="assets/loader/10.jpg" alt="">
+      <img src="assets/loader/11.jpg" alt="">
+      <img src="assets/loader/12.jpg" alt="">
+      <img src="assets/loader/13.jpg" alt="">
+    </div>
+
+    <p class="loader__word" data-word>Pour.</p>
+
+    <div class="loader__foot">
+      <div class="loader__bar"><i></i></div>
+      <div class="loader__count"><span data-count>0</span><small>%</small></div>
+    </div>
+  </div>
+
+  <!-- 3D stage (fixed, sits between section backgrounds and content) -->
+  <canvas id="cup3d" aria-hidden="true"></canvas>
+
+  <div class="grain" aria-hidden="true"></div>
+  <div class="cursor" aria-hidden="true"><span class="cursor__label"></span></div>
+
+  <!-- Kulhu — the Cup2Eat mascot (a little wafer cup with a bite out of his rim). Cloned into every [data-kulhu]. -->
+  <template id="kulhu-tpl">
+    <svg class="kulhu__svg" viewBox="0 0 200 250" aria-hidden="true">
+      <defs>
+        <linearGradient id="k-wafer" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0" stop-color="#b9783a"/><stop offset=".35" stop-color="#e2b06b"/><stop offset=".7" stop-color="#d79d55"/><stop offset="1" stop-color="#a86a31"/>
+        </linearGradient>
+        <mask id="k-bite">
+          <rect x="0" y="0" width="200" height="250" fill="#fff"/>
+          <circle cx="160" cy="70" r="13" fill="#000"/><circle cx="150" cy="62" r="9" fill="#000"/><circle cx="167" cy="83" r="8" fill="#000"/>
+        </mask>
+      </defs>
+      <g class="k-steam" fill="none" stroke="#f3e6cf" stroke-width="5" stroke-linecap="round" opacity=".85">
+        <path d="M88 44c-10-10 8-16-2-28"/><path d="M106 40c-8-9 7-14-1-25"/>
+      </g>
+      <g class="k-arm k-arm--l"><path d="M46 140 C30 128 22 112 22 98" fill="none" stroke="#b9783a" stroke-width="9" stroke-linecap="round"/><circle cx="22" cy="94" r="9" fill="#d79d55"/></g>
+      <g class="k-arm k-arm--r"><path d="M154 140 C168 148 176 160 172 172" fill="none" stroke="#b9783a" stroke-width="9" stroke-linecap="round"/><circle cx="171" cy="176" r="9" fill="#d79d55"/></g>
+      <g class="k-legs" fill="#8f5a2b"><rect x="76" y="208" width="12" height="22" rx="6"/><rect x="112" y="208" width="12" height="22" rx="6"/><ellipse cx="80" cy="232" rx="13" ry="7"/><ellipse cx="120" cy="232" rx="13" ry="7"/></g>
+      <g mask="url(#k-bite)">
+        <path d="M40 74 L160 74 L146 206 Q100 222 54 206 Z" fill="url(#k-wafer)"/>
+        <g stroke="#a86a31" stroke-width="2.4" opacity=".55">
+          <path d="M58 98 L66 202"/><path d="M74 98 L79 208"/><path d="M90 98 L92 210"/><path d="M110 98 L108 210"/><path d="M126 98 L121 208"/><path d="M142 98 L134 202"/>
+        </g>
+        <path d="M37 72 L163 72 L160 96 Q100 104 40 96 Z" fill="#dcaa63"/>
+        <path d="M40 96 Q100 104 160 96" fill="none" stroke="#a86a31" stroke-width="2" opacity=".6"/>
+        <ellipse cx="100" cy="72" rx="64" ry="15" fill="#c48a4a"/>
+        <ellipse cx="100" cy="73" rx="55" ry="10.5" fill="#9b5e30"/>
+        <ellipse cx="96" cy="72" rx="40" ry="6" fill="#b7784a" opacity=".7"/>
+      </g>
+      <g class="k-face">
+        <g class="k-eyes">
+          <ellipse cx="80" cy="132" rx="8" ry="10" fill="#2a1a12"/><ellipse cx="120" cy="132" rx="8" ry="10" fill="#2a1a12"/>
+          <circle cx="83" cy="128" r="3" fill="#fff"/><circle cx="123" cy="128" r="3" fill="#fff"/>
+        </g>
+        <path d="M70 116 q8 -6 16 -1 M114 115 q8 -5 16 1" fill="none" stroke="#5a3418" stroke-width="3" stroke-linecap="round"/>
+        <ellipse cx="66" cy="152" rx="10" ry="6" fill="#d9675c" opacity=".5"/><ellipse cx="134" cy="152" rx="10" ry="6" fill="#d9675c" opacity=".5"/>
+        <path class="k-mouth" d="M86 150 Q100 170 114 150 Z" fill="#5a2324"/>
+        <path d="M93 158 Q100 165 107 158 Q100 154 93 158Z" fill="#d9675c"/>
+      </g>
+      <g transform="translate(100 186)">
+        <circle r="14" fill="#0a4334" stroke="#cfa75b" stroke-width="2.2"/>
+        <text y="4" text-anchor="middle" font-family="Fraunces, Georgia, serif" font-weight="800" font-size="10" fill="#e9cd8b">C2E</text>
+      </g>
+    </svg>
+  </template>
+
+  <!-- ============ TOP BAR ============ -->
+  <header class="nav" data-nav>
+    <a href="#top" class="nav__brand" aria-label="Cup2Eat home">
+      <img src="assets/logo.svg" alt="" width="44" height="44">
+      <span>Cup2Eat</span>
+    </a>
+    <p class="nav__ticker" aria-hidden="true"><span>Free delivery across India</span><span>FSSAI registered</span><span>Sample boxes on request</span></p>
+    <a class="btn btn--gold btn--sm magnetic" data-wa href="https://wa.me/919818192575" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.2-.4.7-1.4.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.3-.2-.5-.3Z"/></svg>
+      <span>Order on WhatsApp</span>
+    </a>
+  </header>
+
+  <!-- ============ BOTTOM DOCK ============ -->
+  <nav class="dock" aria-label="Sections" data-dock>
+    <span class="dock__blob" aria-hidden="true"></span>
+    <a href="#top" class="dock__home" data-spy="top" aria-label="Back to top"><span class="kulhu kulhu--face" data-kulhu></span></a>
+    <a href="#acts" data-spy="acts"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 6h14l-2 14H7z M4 6h16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg><span>The cup</span></a>
+    <a href="#flavours" data-spy="flavours"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="8" cy="9" r="4" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="16" cy="9" r="4" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="16" r="4" fill="none" stroke="currentColor" stroke-width="1.8"/></svg><span>Flavours</span></a>
+    <a href="#business" data-spy="business"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7h18v13H3z M8 7V4h8v3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M3 12h18" stroke="currentColor" stroke-width="1.8"/></svg><span>Order</span></a>
+    <a href="#story" data-spy="story"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 11c0 5.6-7 10-7 10z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg><span>Story</span></a>
+    <a href="#faq" data-spy="faq"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.3-1 .9-1 1.7M12 17h.01" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><span>FAQ</span></a>
+  </nav>
+
+  <main id="top">
+
+    <!-- ============ HERO ============ -->
+    <section class="hero" data-theme="dark">
+      <div class="hero__pattern" aria-hidden="true"></div>
+      <div class="hero__frame" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+      <div class="hero__glow" aria-hidden="true"></div>
+      <div class="hero__outline" aria-hidden="true">EAT YOUR DRINK</div>
+
+      <!-- doodles -->
+      <svg class="doodle doodle--bean" data-speed="0.6" style="left:6%;top:16%" viewBox="0 0 40 52" aria-hidden="true"><ellipse cx="20" cy="26" rx="15" ry="22" fill="#5a331d"/><path d="M20 6 C12 18 28 32 20 46" fill="none" stroke="#2e1a10" stroke-width="3" stroke-linecap="round"/></svg>
+      <svg class="doodle doodle--pod" data-speed="-0.4" style="left:47%;top:12%" viewBox="0 0 60 30" aria-hidden="true"><path d="M4 15 C14 0 46 0 56 15 C46 30 14 30 4 15Z" fill="#9daa54"/><path d="M8 15 H52" stroke="#6f7a33" stroke-width="2"/></svg>
+      <svg class="doodle doodle--star" data-speed="0.9" style="left:58%;top:78%" viewBox="0 0 40 40" aria-hidden="true"><path d="M20 0 L24 16 L40 20 L24 24 L20 40 L16 24 L0 20 L16 16Z" fill="#e9cd8b"/></svg>
+      <svg class="doodle doodle--star" data-speed="-0.7" style="left:91%;top:70%" viewBox="0 0 40 40" aria-hidden="true"><path d="M20 0 L24 16 L40 20 L24 24 L20 40 L16 24 L0 20 L16 16Z" fill="#cfa75b"/></svg>
+      <svg class="doodle doodle--bean" data-speed="-0.5" style="left:86%;top:20%;transform:rotate(40deg)" viewBox="0 0 40 52" aria-hidden="true"><ellipse cx="20" cy="26" rx="15" ry="22" fill="#6b3336"/><path d="M20 6 C12 18 28 32 20 46" fill="none" stroke="#3a1a1c" stroke-width="3" stroke-linecap="round"/></svg>
+
+      <div class="sticker hero__sticker" aria-hidden="true">
+        <svg viewBox="0 0 200 200"><defs><path id="st-c1" d="M100,100 m-74,0 a74,74 0 1,1 148,0 a74,74 0 1,1 -148,0"/></defs>
+          <circle cx="100" cy="100" r="98" fill="#6b3336"/><circle cx="100" cy="100" r="90" fill="none" stroke="#e9cd8b" stroke-width="1.5" stroke-dasharray="3 5"/>
+          <text font-family="Bricolage Grotesque, sans-serif" font-weight="700" font-size="17" letter-spacing="3.2" fill="#f9faf4"><textPath href="#st-c1">100% EDIBLE ✦ PURE VEG ✦ VEGAN ✦ LEAK-PROOF ✦</textPath></text>
+        </svg>
+        <b>₹10<small>a cup</small></b>
+      </div>
+
+      <div class="hero__mascot kulhu" data-kulhu data-say="Psst… I'm edible.|Yes, all of me.|Chai piyo, mujhe bhi khao!|Crunchy on the outside. And inside."></div>
+      <div class="wrap hero__grid">
+        <div class="hero__copy">
+          <p class="eyebrow hero__eyebrow"><span class="dot"></span> Edible cups &middot; Made in Ghaziabad &middot; Shipped across India</p>
+          <h1 class="hero__title">
+            <span class="line"><span>Drink the chai.</span></span>
+            <span class="line"><span><em>Eat</em> the cup.</span></span>
+          </h1>
+          <p class="hero__lede">Crisp, baked cups in chocolate, vanilla and elaichi. Pour in your chai, coffee or a scoop of ice cream&nbsp;&mdash; and when you&rsquo;re done, there&rsquo;s nothing left to throw away.</p>
+          <div class="hero__ctas">
+            <a class="btn btn--gold magnetic" data-wa href="https://wa.me/919818192575" target="_blank" rel="noopener"><span>Order a box</span><i class="arrow" aria-hidden="true"></i></a>
+            <a class="btn btn--ghost magnetic" href="#acts"><span>See how it works</span></a>
+          </div>
+        </div>
+        <div class="hero__note hand" aria-hidden="true">
+          yes, the whole thing
+          <svg viewBox="0 0 120 70" class="hero__arrow"><path d="M4 10 C 40 4, 80 18, 104 52" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path d="M92 50 L105 54 L104 40" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+      </div>
+      <ul class="wrap hero__facts">
+        <li><b>100<small>/150</small></b><span>ml cups</span></li>
+        <li><b>3</b><span>flavours + a choco rim</span></li>
+        <li><b>0</b><span>cups in the bin</span></li>
+        <li class="hero__scroll"><span>scroll</span><i></i></li>
+      </ul>
+    </section>
+
+    <!-- ============ CROSSED TAPES ============ -->
+    <div class="tapes" aria-label="100% edible, pure veg, vegan, leak-proof, FSSAI registered, delivered across India">
+      <div class="marquee marquee--maroon" aria-hidden="true">
+        <div class="marquee__track marquee__track--rev">
+          <span>Pour it</span><i>✦</i><span>Sip it</span><i>✦</i><span>Eat it</span><i>✦</i><span>Small cup, big happiness</span><i>✦</i><span>Pour it</span><i>✦</i><span>Sip it</span><i>✦</i><span>Eat it</span><i>✦</i><span>Small cup, big happiness</span><i>✦</i>
+          <span>Pour it</span><i>✦</i><span>Sip it</span><i>✦</i><span>Eat it</span><i>✦</i><span>Small cup, big happiness</span><i>✦</i><span>Pour it</span><i>✦</i><span>Sip it</span><i>✦</i><span>Eat it</span><i>✦</i><span>Small cup, big happiness</span><i>✦</i>
+        </div>
+      </div>
+      <div class="marquee">
+        <div class="marquee__track">
+          <span>100% edible</span><i>✺</i><span>Pure veg</span><i>✺</i><span>Vegan</span><i>✺</i><span>Leak-proof</span><i>✺</i><span>FSSAI registered</span><i>✺</i><span>Delivered across India</span><i>✺</i>
+          <span>100% edible</span><i>✺</i><span>Pure veg</span><i>✺</i><span>Vegan</span><i>✺</i><span>Leak-proof</span><i>✺</i><span>FSSAI registered</span><i>✺</i><span>Delivered across India</span><i>✺</i>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ MANIFESTO ============ -->
+    <section class="manifesto" data-theme="light">
+      <div class="manifesto__bgtext" aria-hidden="true"><span>chai piyo &middot; cup bhi khao &middot; chai piyo &middot; cup bhi khao &middot;</span></div>
+      <svg class="doodle doodle--swirl" data-speed="0.5" style="right:8%;top:14%" viewBox="0 0 80 80" aria-hidden="true"><path d="M40 70 C10 70 8 30 36 28 C56 26 56 52 40 52 C30 52 30 40 38 40" fill="none" stroke="#6b3336" stroke-width="4" stroke-linecap="round"/></svg>
+      <svg class="doodle doodle--pod" data-speed="-0.6" style="left:4%;bottom:12%" viewBox="0 0 60 30" aria-hidden="true"><path d="M4 15 C14 0 46 0 56 15 C46 30 14 30 4 15Z" fill="#9daa54"/><path d="M8 15 H52" stroke="#6f7a33" stroke-width="2"/></svg>
+      <div class="wrap">
+        <p class="eyebrow">Why we started</p>
+        <p class="manifesto__text" data-scrub-words>
+          A paper cup works for exactly one chai. Then it becomes someone else&rsquo;s problem&nbsp;&mdash; most of them are lined with plastic, so they don&rsquo;t really go away, they just go somewhere else. We thought the cup deserved a better ending. So we made one you can eat.
+        </p>
+        <p class="hand manifesto__hand">chai piyo, cup bhi khao.</p>
+      </div>
+    </section>
+
+    <!-- ============ THREE ACTS (pinned, drives the 3D cup) ============ -->
+    <section class="acts" id="acts" data-theme="light">
+      <div class="acts__pin">
+        <div class="wrap acts__grid">
+          <div class="acts__head">
+            <p class="eyebrow">How it works</p>
+            <h2 class="h2">One cup,<br><em>three acts.</em></h2>
+          </div>
+          <ol class="acts__list">
+            <li class="act is-active" data-act="0">
+              <span class="act__num">01</span>
+              <div>
+                <h3>Pour.</h3>
+                <p>Hot chai, filter coffee, cold coffee, a shake. It&rsquo;s baked to be leak-proof, so whatever you pour stays exactly where it should.</p>
+              </div>
+            </li>
+            <li class="act" data-act="1">
+              <span class="act__num">02</span>
+              <div>
+                <h3>Sip.</h3>
+                <p>Drink it the way you always do. The only difference is the rim&nbsp;&mdash; chocolate, vanilla or elaichi, right under your lip. (Chocolate with coffee is a dangerous habit. Just saying.)</p>
+              </div>
+            </li>
+            <li class="act" data-act="2">
+              <span class="act__num">03</span>
+              <div>
+                <h3>Eat.</h3>
+                <p>Then bite in. Crunchy, a little sweet, 100% edible. Nothing goes in the bin, because there&rsquo;s nothing left to put in it.</p>
+              </div>
+            </li>
+          </ol>
+          <div class="acts__progress" aria-hidden="true"><i></i></div>
+        </div>
+        <p class="hand acts__crunch" aria-hidden="true">*crunch*</p>
+      </div>
+    </section>
+
+    <!-- ============ FLAVOURS ============ -->
+    <section class="flavours" id="flavours" data-theme="light" data-flavour="vanilla">
+      <div class="wrap flavours__grid">
+        <div class="flavours__stage" data-drag>
+          <p class="hand flavours__hint" aria-hidden="true">drag to spin &rarr;</p>
+          <p class="hand flavours__more" aria-hidden="true">don&rsquo;t worry,<br>we made another one.</p>
+        </div>
+        <div class="flavours__panel">
+          <p class="eyebrow">Build your cup</p>
+          <h2 class="h2">Three flavours.<br><em>Pick a favourite.</em></h2>
+
+          <div class="picker" role="tablist" aria-label="Cup flavour">
+            <button class="chip is-on" role="tab" aria-selected="true" data-flavour-btn="vanilla"><i style="--c:#e2b878"></i>Vanilla</button>
+            <button class="chip" role="tab" aria-selected="false" data-flavour-btn="chocolate"><i style="--c:#5a3320"></i>Chocolate</button>
+            <button class="chip" role="tab" aria-selected="false" data-flavour-btn="elaichi"><i style="--c:#b3b066"></i>Elaichi</button>
+            <button class="chip chip--new" role="tab" aria-selected="false" data-flavour-btn="rim"><i style="--c:linear-gradient(#3a1d0f 45%, #dcaa66 45%)"></i>Choco rim<em>new</em></button>
+          </div>
+
+          <div class="flavour-copy">
+            <article data-flavour-copy="vanilla" class="is-on">
+              <figure class="flavour-copy__img"><img src="assets/img/vanilla.jpg" alt="Bundle of vanilla pods tied with string" loading="lazy"></figure>
+              <div>
+                <h3>Vanilla</h3>
+                <p>The golden, biscuity one. Gentle enough to sit under masala chai without fighting it, and the one most people finish first.</p>
+                <p class="pairs"><span>Pairs with</span> masala chai &middot; cold coffee &middot; shakes</p>
+              </div>
+            </article>
+            <article data-flavour-copy="chocolate">
+              <figure class="flavour-copy__img"><img src="assets/img/chocolate.jpg" alt="Bar of dark chocolate next to cocoa nibs" loading="lazy"></figure>
+              <div>
+                <h3>Chocolate</h3>
+                <p>Dark, cocoa-rich and built for coffee. We also do a chocolate-coated version for ice cream&nbsp;&mdash; the bit at the bottom is the best bit.</p>
+                <p class="pairs"><span>Pairs with</span> espresso &middot; latte &middot; ice cream</p>
+              </div>
+            </article>
+            <article data-flavour-copy="elaichi">
+              <figure class="flavour-copy__img"><img src="assets/img/elaichi.jpg" alt="A handful of green cardamom pods" loading="lazy"></figure>
+              <div>
+                <h3>Elaichi</h3>
+                <p>Green cardamom, the way your nani put it in everything. Pour plain chai in this one and it tastes like someone made it for you.</p>
+                <p class="pairs"><span>Pairs with</span> cutting chai &middot; kadak chai &middot; kheer</p>
+              </div>
+            </article>
+            <article data-flavour-copy="rim">
+              <figure class="flavour-copy__img"><img src="assets/img/chocolate.jpg" alt="Bar of dark chocolate next to cocoa nibs" loading="lazy"></figure>
+              <div>
+                <h3>Chocolate rim</h3>
+                <p>Our newest one. Chocolate only on the top lip, right where your mouth goes, so every sip gets a little extra &mdash; without coating the whole cup.</p>
+                <p class="pairs"><span>Pairs with</span> cappuccino &middot; hot chocolate &middot; cold coffee</p>
+              </div>
+            </article>
+          </div>
+
+          <div class="drinks">
+            <p class="drinks__label">Fill it with</p>
+            <div class="drinks__row" role="group" aria-label="Fill the cup with">
+              <button class="pill is-on" data-drink-btn="chai">Chai</button>
+              <button class="pill" data-drink-btn="coffee">Coffee</button>
+              <button class="pill" data-drink-btn="icecream">Ice cream</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ USES (horizontal) ============ -->
+    <section class="uses" id="uses" data-theme="dark">
+      <div class="uses__pin">
+        <div class="uses__track">
+          <div class="uses__intro">
+            <p class="eyebrow">What goes in it</p>
+            <h2 class="h2">Pour<br><em>anything.</em></h2>
+            <p>A 100&nbsp;ml cup for hot drinks, a 150&nbsp;ml one for the cold stuff. These are the jobs our customers keep giving them.</p>
+            <p class="hand">keep scrolling &rarr;</p>
+          </div>
+          <figure class="use">
+            <div class="use__img"><img src="assets/img/chai-kulhad.jpg" alt="Masala chai being poured into small clay cups" loading="lazy"></div>
+            <figcaption><span class="use__n">01</span><h3>Chai</h3><p>The reason this whole thing exists. Cutting, kadak, masala&nbsp;&mdash; all of it.</p></figcaption>
+          </figure>
+          <figure class="use">
+            <div class="use__img"><img src="assets/img/coffee-pour.jpg" alt="Milk being poured into a cup of coffee, making latte art" loading="lazy"></div>
+            <figcaption><span class="use__n">02</span><h3>Hot coffee</h3><p>Latte, cappuccino, filter. Go chocolate for this one. Trust us.</p></figcaption>
+          </figure>
+          <figure class="use">
+            <div class="use__img"><img src="assets/img/cold-coffee.jpg" alt="Cream being poured into a glass of iced coffee" loading="lazy"></div>
+            <figcaption><span class="use__n">03</span><h3>Cold coffee &amp; shakes</h3><p>Cold drinks, crunchy cup. The vanilla cup with a cold coffee is a summer afternoon sorted.</p></figcaption>
+          </figure>
+          <figure class="use">
+            <div class="use__img"><img src="assets/img/icecream.jpg" alt="Scoop of chocolate ice cream" loading="lazy"></div>
+            <figcaption><span class="use__n">04</span><h3>Ice cream &amp; desserts</h3><p>Our chocolate-coated cups were made for this. Enjoy your ice cream. Eat your cup too.</p></figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ WHY ============ -->
+    <section class="why" data-theme="light">
+      <svg class="doodle doodle--star" data-speed="0.8" style="right:6%;top:8%" viewBox="0 0 40 40" aria-hidden="true"><path d="M20 0 L24 16 L40 20 L24 24 L20 40 L16 24 L0 20 L16 16Z" fill="#6b3336"/></svg>
+      <svg class="doodle doodle--bean" data-speed="-0.5" style="left:3%;top:40%" viewBox="0 0 40 52" aria-hidden="true"><ellipse cx="20" cy="26" rx="15" ry="22" fill="#5a331d"/><path d="M20 6 C12 18 28 32 20 46" fill="none" stroke="#2e1a10" stroke-width="3" stroke-linecap="round"/></svg>
+      <div class="wrap">
+        <div class="why__head">
+          <p class="eyebrow">The small print, made big</p>
+          <h2 class="h2">Everything you&rsquo;d want<br>to ask, <em>answered upfront.</em></h2>
+        </div>
+        <ul class="why__grid">
+          <li data-reveal><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M12 14h24l-3 26H15z" fill="none" stroke="currentColor" stroke-width="2"/><path d="M28 14c0-3 2-5 5-5" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="31" cy="12" r="5" fill="var(--paper)" stroke="currentColor" stroke-width="2"/></svg><h3>100% edible</h3><p>Every bit of it. Rim, wall, base. That&rsquo;s the whole point.</p></li>
+          <li data-reveal><svg viewBox="0 0 48 48" aria-hidden="true"><rect x="9" y="9" width="30" height="30" rx="3" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="24" cy="24" r="7" fill="currentColor"/></svg><h3>Pure veg &amp; vegan</h3><p>No eggs, no dairy in the cup. Safe for pretty much every guest list.</p></li>
+          <li data-reveal><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M24 7c6 9 11 15 11 22a11 11 0 0 1-22 0c0-7 5-13 11-22Z" fill="none" stroke="currentColor" stroke-width="2"/><path d="M19 30a5 5 0 0 0 5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><h3>Leak-proof</h3><p>Baked to hold hot and cold drinks without making a scene on your hand.</p></li>
+          <li data-reveal><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M14 10h20l-2.5 30h-15z" fill="none" stroke="currentColor" stroke-width="2"/><path d="M15 22h18" stroke="currentColor" stroke-width="2" stroke-dasharray="3 3"/></svg><h3>100 ml</h3><p>Proper chai size. Big enough to matter, small enough to finish.</p></li>
+          <li data-reveal><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M24 6l14 6v10c0 9-6 16-14 20-8-4-14-11-14-20V12z" fill="none" stroke="currentColor" stroke-width="2"/><path d="M17 24l5 5 9-10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><h3>FSSAI registered</h3><p>Reg. no. 22725105002487. Packed safely, every single box.</p></li>
+          <li data-reveal><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M5 14h24v18H5zM29 20h8l6 6v6H29z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><circle cx="13" cy="35" r="3.5" fill="var(--paper)" stroke="currentColor" stroke-width="2"/><circle cx="35" cy="35" r="3.5" fill="var(--paper)" stroke="currentColor" stroke-width="2"/></svg><h3>Delivered across India</h3><p>From Ghaziabad to Odisha and everywhere in between. Delivery included.</p></li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ============ BUSINESS ============ -->
+    <section class="business" id="business" data-theme="dark">
+      <div class="business__pattern" aria-hidden="true"></div>
+      <div class="sticker business__sticker" aria-hidden="true">
+        <svg viewBox="0 0 200 200"><defs><path id="st-c2" d="M100,100 m-74,0 a74,74 0 1,1 148,0 a74,74 0 1,1 -148,0"/></defs>
+          <circle cx="100" cy="100" r="98" fill="#cfa75b"/><circle cx="100" cy="100" r="90" fill="none" stroke="#6b3336" stroke-width="1.5" stroke-dasharray="3 5"/>
+          <text font-family="Bricolage Grotesque, sans-serif" font-weight="700" font-size="17" letter-spacing="3" fill="#6b3336"><textPath href="#st-c2">FREE DELIVERY ✦ ALL OVER INDIA ✦ FREE DELIVERY ✦</textPath></text>
+        </svg>
+        <b class="sticker__dark">₹0<small>shipping</small></b>
+      </div>
+      <div class="wrap business__grid">
+        <div class="business__copy">
+          <p class="eyebrow">For caf&eacute;s, caterers &amp; events</p>
+          <h2 class="h2">Serve something<br>people <em>talk about.</em></h2>
+          <p class="lede">A drink in an edible cup gets photographed, posted and remembered. We supply caf&eacute;s, restaurants, college fests, corporate events and weddings&nbsp;&mdash; in bulk, with delivery included anywhere in India.</p>
+
+          <ul class="who">
+            <li><img src="assets/img/cafe.jpg" alt="" loading="lazy"><span>Caf&eacute;s &amp; restaurants</span></li>
+            <li><img src="assets/img/chaiwala.jpg" alt="" loading="lazy"><span>Chai stalls &amp; tapris</span></li>
+            <li><img src="assets/img/events.jpg" alt="" loading="lazy"><span>Weddings &amp; events</span></li>
+            <li><img src="assets/img/college.jpg" alt="" loading="lazy"><span>Colleges &amp; corporate</span></li>
+          </ul>
+        </div>
+
+        <div class="calc" data-reveal>
+          <div class="calc__mascot kulhu" data-kulhu data-say="Order karo na!|I travel pan-India. Free.|Main bhi khaane layak hoon."></div>
+          <div class="calc__tag" data-p-tag>Wholesale offer</div>
+
+          <div class="calc__products" role="radiogroup" aria-label="Pick a cup">
+            <label><input type="radio" name="product" value="regular" checked><span>Regular<small>100 ml &middot; hot</small></span></label>
+            <label><input type="radio" name="product" value="cold"><span>Cold<small>150 ml &middot; shakes</small></span></label>
+            <label><input type="radio" name="product" value="coated"><span>Choco-coated<small>100 ml</small></span></label>
+            <label><input type="radio" name="product" value="rim"><span>Choco rim<small>100 ml &middot; new</small></span></label>
+          </div>
+
+          <p class="calc__price"><span>₹</span><b data-p-price>3,999</b></p>
+          <p class="calc__per" data-p-per>per box of <b>396 cups</b> &middot; works out to about ₹10 a cup</p>
+
+          <label class="calc__label" for="boxes">How many boxes? <small data-p-min>(minimum 5)</small></label>
+          <div class="calc__range">
+            <input type="range" id="boxes" min="5" max="50" step="1" value="5">
+            <output for="boxes" data-boxes>5</output>
+          </div>
+
+          <dl class="calc__sum">
+            <div><dt>Cups</dt><dd data-cups>1,980</dd></div>
+            <div><dt>Total</dt><dd data-total>₹19,995</dd></div>
+            <div><dt>Delivery</dt><dd>Included</dd></div>
+          </dl>
+
+          <fieldset class="calc__mix">
+            <legend>Flavour mix</legend>
+            <label><input type="checkbox" value="Vanilla" checked> Vanilla</label>
+            <label><input type="checkbox" value="Chocolate" checked> Chocolate</label>
+            <label><input type="checkbox" value="Elaichi"> Elaichi</label>
+          </fieldset>
+
+          <a class="btn btn--gold btn--block magnetic" data-order href="https://wa.me/919818192575" target="_blank" rel="noopener"><span>Send this order on WhatsApp</span><i class="arrow" aria-hidden="true"></i></a>
+          <p class="calc__fine">Regular-cup price is this month&rsquo;s Instagram offer; the others are from our latest catalogue. We&rsquo;ll confirm stock and dispatch date on WhatsApp before you pay. Want to try first? Ask for a sample box.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ STORY / SCRAPBOOK ============ -->
+    <section class="story" id="story" data-theme="light">
+      <div class="story__pattern" aria-hidden="true"></div>
+      <div class="wrap story__grid">
+        <div class="story__copy">
+          <p class="eyebrow">Our story</p>
+          <h2 class="h2">Started by a student<br>with a <em>very</em> simple question.</h2>
+          <p>Cup2Eat is <strong>Varun Khera</strong>&rsquo;s idea, and it started while he was still doing his BBA at IPEM, Ghaziabad. The question was simple enough to be annoying: why should the cup be the one thing you throw away?</p>
+          <p>He took the idea to business-plan competitions before he took it to customers&nbsp;&mdash; and won first place at the <em>Planpreneur</em> competition at SPECTRA 2025. Since then it&rsquo;s been stalls at college fests, corporate events and celebrations (twenty-plus certificates and counting), and boxes leaving Ghaziabad for every corner of the country.</p>
+          <p>It&rsquo;s still a small team. Every order is packed by hand, and every message on WhatsApp gets answered by a person.</p>
+          <p class="hand story__sign">&mdash; Team Cup2Eat</p>
+        </div>
+
+        <p class="hand scrapbook__hint" aria-hidden="true">swipe the photos &rarr;</p>
+        <div class="scrapbook">
+          <figure class="polaroid" style="--r:-4deg" data-polaroid>
+            <img src="assets/ig/happy.jpg" alt="The Cup2Eat stall with banners and packed edible cups" loading="lazy">
+            <figcaption>our stall. banner, boxes, a lot of cups.</figcaption>
+            <i class="tape"></i>
+          </figure>
+          <figure class="polaroid" style="--r:3deg" data-polaroid>
+            <img src="assets/ig/reel2.jpg" alt="A student at Lady Shri Ram College tasting an edible cup" loading="lazy">
+            <figcaption>LSR, Delhi &mdash; first bite.</figcaption>
+            <i class="tape"></i>
+          </figure>
+          <figure class="polaroid" style="--r:-2deg" data-polaroid>
+            <img src="assets/ig/certs.jpg" alt="Certificate of Achievement, first position, Planpreneur at SPECTRA 2025" loading="lazy">
+            <figcaption>1st place, Planpreneur &rsquo;25 &#9733;</figcaption>
+            <i class="tape"></i>
+          </figure>
+          <figure class="polaroid" style="--r:5deg" data-polaroid>
+            <img src="assets/ig/tradefair.jpg" alt="Varun at Startup Mahakumbh, Bharat Mandapam, April 2025" loading="lazy">
+            <figcaption>&ldquo;This year: visitor. Very soon to be exhibitor.&rdquo;</figcaption>
+            <i class="tape"></i>
+          </figure>
+          <figure class="polaroid" style="--r:-3deg" data-polaroid>
+            <img src="assets/ig/dispatch.jpg" alt="Varun holding a packed shipping box" loading="lazy">
+            <figcaption>Ghaziabad &rarr; Odisha. handle with care!</figcaption>
+            <i class="tape"></i>
+          </figure>
+        </div>
+      </div>
+
+      <ol class="wrap timeline">
+        <li data-reveal><time>Apr 2025</time><p>Walks around Startup Mahakumbh at Bharat Mandapam as a visitor, notebook in hand.</p></li>
+        <li data-reveal><time>Nov 2025</time><p>First place, Planpreneur business-plan competition &mdash; SPECTRA 2025, IPEM Ghaziabad.</p></li>
+        <li data-reveal><time>2026</time><p>Stalls at college fests, corporate events and celebrations. 20+ certificates.</p></li>
+        <li data-reveal><time>Now</time><p>Wholesale boxes shipping pan-India, three flavours, and a new catalogue.</p></li>
+      </ol>
+    </section>
+
+    <!-- ============ FAQ ============ -->
+    <section class="faq" id="faq" data-theme="light">
+      <div class="wrap faq__grid">
+        <div>
+          <p class="eyebrow">Questions</p>
+          <h2 class="h2">The ones<br><em>everyone</em> asks.</h2>
+          <p class="hand faq__hand">(usually while holding one)</p>
+          <div class="faq__mascot kulhu" data-kulhu data-say="Ask me anything!|Haan, main vegan hoon.|Yes, I'm FSSAI registered."></div>
+        </div>
+        <div class="faq__list">
+          <details>
+            <summary>Is the whole cup actually edible?</summary>
+            <p>Yes. It&rsquo;s a baked cup&nbsp;&mdash; rim, wall and base&nbsp;&mdash; and it&rsquo;s 100% edible, pure veg and vegan. Finish your drink, then finish the cup.</p>
+          </details>
+          <details>
+            <summary>Will it leak with hot chai?</summary>
+            <p>It&rsquo;s made to be leak-proof for both hot and cold drinks. Like anything baked, it&rsquo;s at its crunchiest when you drink while it&rsquo;s hot&nbsp;&mdash; which, with chai, has never been the problem.</p>
+          </details>
+          <details>
+            <summary>What flavours and sizes do you have?</summary>
+            <p>The 100&nbsp;ml hot cup comes in Chocolate, Vanilla and Elaichi. There&rsquo;s a 150&nbsp;ml cup for cold coffee and shakes, a fully chocolate-coated 100&nbsp;ml cup, and our new chocolate-rim cup (chocolate only on the lip).</p>
+          </details>
+          <details>
+            <summary>What does it cost?</summary>
+            <p>Regular 100&nbsp;ml: ₹3,999 for 396 cups on this month&rsquo;s offer (minimum 5 boxes). 150&nbsp;ml cold: ₹6,500 for 432 or ₹3,300 for 125. Chocolate-coated: ₹4,499 for 200. Chocolate rim: ₹5,500 for 396. Delivery is included anywhere in India&nbsp;&mdash; message us and we&rsquo;ll confirm the latest price and stock.</p>
+          </details>
+          <details>
+            <summary>What&rsquo;s it made of?</summary>
+            <p>Refined wheat flour (maida), wheat flour, pulses, corn flour, dextrose sugar, salt, emulsifiers, permitted food colours (INS 102, 122, 133), acidity regulator (INS 514), vegetable oil, baking powder (E500), flavouring, preservative (E223) and spices. If you have an allergy, ask us before you order.</p>
+          </details>
+          <details>
+            <summary>Can I try them before ordering in bulk?</summary>
+            <p>Yes&nbsp;&mdash; ask us for a sample box on WhatsApp or call <a href="tel:+919818192575">98181 92575</a>.</p>
+          </details>
+          <details>
+            <summary>Do you do stalls at events?</summary>
+            <p>We&rsquo;ve done college fests, corporate events and celebrations. Tell us the date, the city and roughly how many people, and we&rsquo;ll take it from there.</p>
+          </details>
+          <details>
+            <summary>Are you certified?</summary>
+            <p>Yes, Cup2Eat is FSSAI registered. Registration no. 22725105002487.</p>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ FOOTER / CTA ============ -->
+    <footer class="footer" data-theme="dark">
+      <div class="wrap">
+        <p class="eyebrow">Hungry for an order?</p>
+        <div class="footer__mascot kulhu kulhu--wave" data-kulhu data-say="Bye! Come back thirsty.|Phir milenge!|Don't forget to eat your cup."></div>
+        <h2 class="footer__big" data-wobble>Eat your drink.</h2>
+        <div class="footer__ctas">
+          <a class="btn btn--gold magnetic" data-wa href="https://wa.me/919818192575" target="_blank" rel="noopener"><span>WhatsApp us</span><i class="arrow" aria-hidden="true"></i></a>
+          <a class="btn btn--ghost magnetic" href="tel:+919818192575"><span>+91 98181 92575</span></a>
+        </div>
+
+        <div class="footer__cols">
+          <div>
+            <img src="assets/logo.svg" alt="Cup2Eat logo" width="88" height="88">
+            <p>Small cup. Big happiness.</p>
+          </div>
+          <div>
+            <h4>Talk to us</h4>
+            <a href="tel:+919818192575">+91 98181 92575</a>
+            <a href="mailto:varunkhera6@gmail.com">varunkhera6@gmail.com</a>
+            <a href="https://www.instagram.com/cup2eat/" target="_blank" rel="noopener">Instagram &mdash; @cup2eat</a>
+          </div>
+          <div>
+            <h4>Find us</h4>
+            <p>Ghaziabad, Uttar Pradesh<br>Delivering pan-India</p>
+          </div>
+          <div>
+            <h4>Paperwork</h4>
+            <p>FSSAI Reg. No.<br>22725105002487</p>
+          </div>
+        </div>
+
+        <div class="footer__base">
+          <p>&copy; <span data-year>2026</span> Cup2Eat. Founded by Varun Khera.</p>
+          <p>Lifestyle photography via Unsplash. Everything else is ours.</p>
+          <a href="#top" class="totop">Back to top &uarr;</a>
+        </div>
+      </div>
+    </footer>
+  </main>
+
+  <script src="vendor/gsap.min.js"></script>
+  <script src="vendor/ScrollTrigger.min.js"></script>
+  <script src="vendor/lenis.min.js"></script>
+  <script type="module" src="js/main.js?v=3"></script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+# local research scratch (downloaded references, contact sheets, notes)
+_research/
+
+# editor / tool config
+.claude/
+.vscode/
+.idea/
+
+# OS junk
+Thumbs.db
+Desktop.ini
+.DS_Store
